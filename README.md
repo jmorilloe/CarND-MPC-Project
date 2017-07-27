@@ -1,3 +1,30 @@
+# Model Predictive Controller Project
+
+Model predictive control (MPC) is an advanced method of process control. The main advantage of MPC is the fact that it allows the current timeslot to be optimized, while keeping future timeslots in account. This is achieved by optimizing a finite time-horizon, but only implementing the current timeslot. MPC has the ability to anticipate future events and can take control actions accordingly.
+
+**Rubric Points**
+
+* The Model:
+
+We'll use a Kinematic Model which contains the vehicle's coordinates, angle, speed, crosstrack error and angle error (vehicle state). We'll also use the steering angle and throttle (actuators).
+
+These are the kinematic ecuations used by the model:
+
+![model_equations](./model_equations.png)
+
+* Timestemp Length and Elapsed Duration (N & dt):
+
+At first I chose the same parameters as in the CarND-MPC-Quizzes (N=25/dt=0.05) and with a reference velocity of 40 the car was able to drive the track, although not to gracefully. I also played with other values (15/0.05), (10/0.05), (25/0.1), (15/0.1), etc... This was before taking the latency into account. After including the latency in the solution returned by the solve method I was able to increase the speed up to 65 and reduce N and dt to (10/0.1) which were the values suggested in the office hours.
+
+* Polynomial Fitting and MPC Preprocessing:
+
+Waypoint are preprocessed and converted to the vehicle's coordinates to make further calculations and debugging easier.
+
+* Model Predictive Control with Latency:
+
+Real world latency is taken into account in this project by delaying the actuations by 100 ms. As dt = latency = 100ms, our approach will be to sum the next step actuation and the next predicted actuation. This trick enabled us to follow the yellow line much more closely and increasing the driving speed.
+
+
 # CarND-Controls-MPC
 Self-Driving Car Engineer Nanodegree Program
 
