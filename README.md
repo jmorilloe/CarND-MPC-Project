@@ -34,6 +34,7 @@ Waypoint are preprocessed and converted to the vehicle's coordinates to make fur
 
 Real world latency is taken into account in this project by delaying the actuations by 100 ms. As dt = latency = 100ms, our approach will be to sum of the first and second control inputs instead of just the first one. This trick enabled us to follow the yellow line much more closely and increasing the driving speed.
 
+This is a [link to my video result](https://youtu.be/7NRUHcpEL1U)
 
 # CarND-Controls-MPC
 Self-Driving Car Engineer Nanodegree Program
