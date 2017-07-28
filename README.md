@@ -14,6 +14,16 @@ These are the kinematic ecuations used by the model:
 
 * Timestemp Length and Elapsed Duration (N & dt):
 
+N, dt and T are hyperparameters we need to tune for our model.
+
+The prediction horizon is the duration over which future predictions are made. We’ll refer to this as T.
+
+T is the product of two other variables, N and dt.
+
+N is the number of timesteps in the horizon and dt is how much time elapses between actuations. For example, if N were 20 and dt were 0.5, then T would be 10 seconds.
+
+A low dt means more frequent actuations, resulting in a more accurate control. If the dt value is too large the model would have problems to approximate a continuous reference trajectory. N determines the number of variables optimized by the MPC, which is the major driver of computational cost. N*dt = T is the time horizon. In our case, T should be a few seconds, at most. Beyond that, the environment will change enough that it won't make sense to predict any further into the future. This is also why for higher speeds T should be lower, as the environment changes faster.
+
 At first I chose the same parameters as in the CarND-MPC-Quizzes (N=25/dt=0.05) and with a reference velocity of 40 the car was able to drive the track, although not to gracefully. I also played with other values (15/0.05), (10/0.05), (25/0.1), (15/0.1), etc... This was before taking the latency into account. After including the latency in the solution returned by the solve method I was able to increase the speed up to 65 and reduce N and dt to (10/0.1) which were the values suggested in the office hours.
 
 * Polynomial Fitting and MPC Preprocessing:
@@ -22,7 +32,7 @@ Waypoint are preprocessed and converted to the vehicle's coordinates to make fur
 
 * Model Predictive Control with Latency:
 
-Real world latency is taken into account in this project by delaying the actuations by 100 ms. As dt = latency = 100ms, our approach will be to sum the next step actuation and the next predicted actuation. This trick enabled us to follow the yellow line much more closely and increasing the driving speed.
+Real world latency is taken into account in this project by delaying the actuations by 100 ms. As dt = latency = 100ms, our approach will be to sum of the first and second control inputs instead of just the first one. This trick enabled us to follow the yellow line much more closely and increasing the driving speed.
 
 
 # CarND-Controls-MPC
