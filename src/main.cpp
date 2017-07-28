@@ -98,8 +98,28 @@ int main() {
           * Both are in between [-1, 1].
           *
           */
-          double steer_value;
-          double throttle_value;
+
+          auto waypoints_ptsx = Eigen::VectorXd(ptsx.size());
+          auto waypoints_ptsy = Eigen::VectorXd(ptsy.size());
+
+          for (unsigned int i = 0; i < ptsx.size(); i++) {
+            double x = (ptsx[i] - px) * cos(psi) + (ptsy[i] - py) * sin(psi);
+            double y = -(ptsx[i] - px) * sin(psi) + (ptsy[i] - py) * cos(psi);
+            waypoints_ptsx[i] = x;
+            waypoints_ptsy[i] = y;
+          }
+
+          auto coeffs = polyfit(waypoints_ptsx, waypoints_ptsy, 3);
+          auto cte = polyeval(coeffs, 0);
+          auto epsi = atan(coeffs[1]);
+
+          Eigen::VectorXd state_vector(6);
+          state_vector << 0, 0, 0, v, cte, epsi;
+
+          auto results = mpc.Solve(state_vector, coeffs);          
+
+          double steer_value = -results[0];
+          double throttle_value = results[1];          
 
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
@@ -108,18 +128,23 @@ int main() {
           msgJson["throttle"] = throttle_value;
 
           //Display the MPC predicted trajectory 
-          vector<double> mpc_x_vals;
-          vector<double> mpc_y_vals;
+          vector<double> mpc_x_vals = mpc.mpc_x_vals;
+          vector<double> mpc_y_vals = mpc.mpc_x_vals;          
 
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Green line
 
-          msgJson["mpc_x"] = mpc_x_vals;
-          msgJson["mpc_y"] = mpc_y_vals;
+          msgJson["mpc_x"] = mpc.mpc_x_vals;
+          msgJson["mpc_y"] = mpc.mpc_y_vals;
 
           //Display the waypoints/reference line
           vector<double> next_x_vals;
           vector<double> next_y_vals;
+          
+          for (auto i = 0; i < waypoints_ptsx.size(); i++) {
+            next_x_vals.push_back(waypoints_ptsx[i]);
+            next_y_vals.push_back(waypoints_ptsy[i]);
+          }
 
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Yellow line
